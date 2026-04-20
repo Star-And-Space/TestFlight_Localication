@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TestFlightAPI;
+using KSP.Localization;
 
 namespace TestFlight
 {
@@ -174,7 +175,7 @@ namespace TestFlight
                 {
                     foreach (var handler in engines)
                     {
-                        handler.engine.Status = "<color=orange>Failed</color>";
+                        handler.engine.Status = Localizer.Format("#TestFlight_Status_Failed");
                         handler.engine.StatusL2 = $"<color=orange>{failureTitle}</color>";
                     }
                 }

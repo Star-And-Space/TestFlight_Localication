@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TestFlightAPI;
 using TestFlightCore;
+using KSP.Localization;
 
 namespace TestFlight
 {
@@ -30,7 +31,7 @@ namespace TestFlight
                         // core is not yet available here
                         float reliabilityMin = TestFlightUtil.FailureRateToReliability(nodeReliability.Evaluate(nodeReliability.minTime), reliabilityAtTime);
                         float reliabilityMax = TestFlightUtil.FailureRateToReliability(nodeReliability.Evaluate(nodeReliability.maxTime), reliabilityAtTime);
-                        return $"  Reliability at 0 data: <color=#b1cc00ff>{reliabilityMin:P1}</color>\n  Reliability at max data: <color=#b1cc00ff>{reliabilityMax:p1}</color>";
+                        return Localizer.Format("#TestFlight_Reliability", reliabilityMin, reliabilityMax);
                     }
                 }
             }

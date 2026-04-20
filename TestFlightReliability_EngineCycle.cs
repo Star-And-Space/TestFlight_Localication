@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 using UnityEngine;
+using KSP.Localization;
 
 using TestFlightAPI;
 using TestFlightCore;
@@ -37,7 +38,7 @@ namespace TestFlight
         /// <summary>
         /// maximum rated cumulative run time of the engine over the entire lifecycle
         /// </summary>
-        [KSPField(guiName = "Rated Cumulative Burn Time", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiUnits = "s")]
+        [KSPField(guiName = "#TestFlight_RatedCumulativeTime", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiUnits = "s")]
         public float ratedBurnTime = 0f;
         
         /// <summary>
@@ -49,7 +50,7 @@ namespace TestFlight
         /// <summary>
         /// maximum rated continuous burn time between restarts
         /// </summary>
-        [KSPField(guiName = "Rated Continuous Burn Time", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiUnits = "s")]
+        [KSPField(guiName = "#TestFlight_RatedContinuousTime", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiUnits = "s")]
         public float ratedContinuousBurnTime;
         
         [KSPField]
@@ -62,22 +63,22 @@ namespace TestFlight
         /// <summary>
         /// amount of seconds engine has been running over the entire lifecycle (cumulative)
         /// </summary>
-        [KSPField(isPersistant = true, guiName = "Total Run Time", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "N0")]
+        [KSPField(isPersistant = true, guiName = "#TestFlight_TotalRunTime", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "N0")]
         public double engineOperatingTime = 0d;
 
         /// <summary>
         /// amount of second engine has been running since last start/restart
         /// </summary>
-        [KSPField(isPersistant = true, guiName = "Current Run Time", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "N0")]
+        [KSPField(isPersistant = true, guiName = "#TestFlight_CurrentRunTime", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "N0")]
         public double currentRunTime;
         
-        [KSPField(isPersistant = false, guiName = "Thrust Modifier", groupName = "TestFlightDebug", groupDisplayName = "TestFlightDebug", guiActive = true, guiFormat = "P2")]
+        [KSPField(isPersistant = false, guiName = "#TestFlight_ThrustModifier", groupName = "TestFlightDebug", groupDisplayName = "TestFlightDebug", guiActive = true, guiFormat = "P2")]
         public float thrustModifierDisplay = 1f;
 
-        [KSPField(isPersistant = false, guiName = "Thrust Ratio", groupName = "TestFlightDebug", groupDisplayName = "TestFlightDebug", guiActive = true)]
+        [KSPField(isPersistant = false, guiName = "#TestFlight_ThrustRatio", groupName = "TestFlightDebug", groupDisplayName = "TestFlightDebug", guiActive = true)]
         public float thrustRatioDisplay = 1f;
 
-        [KSPField(isPersistant = false, guiName = "Engine Module", groupName = "TestFlightDebug",
+        [KSPField(isPersistant = false, guiName = "#TestFlight_EngineModule", groupName = "TestFlightDebug",
             groupDisplayName = "TestFlightDebug", guiActive = true)]
         public string engineModule;
 
@@ -87,21 +88,21 @@ namespace TestFlight
         /// <summary>
         /// Current MTBF
         /// </summary>
-        [KSPField(guiName = "Mean Time Between Failures", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true)]
+        [KSPField(guiName = "#TestFlight_MTBF", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true)]
         public string currentMTBF;
 
         /// <summary>
         /// Current flight data
         /// </summary>
-        [KSPField(guiName = "Flight Data", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiActiveEditor = true, guiFormat = "F0")]
+        [KSPField(guiName = "#TestFlight_FlightData", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiActiveEditor = true, guiFormat = "F0")]
         public double flightData = 0d;
 
         private double maxFlightData = 0d;
 
-        [KSPField(guiName = "Current Reliability", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiFormat = "P2")]
+        [KSPField(guiName = "#TestFlight_CurrentReliability", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiFormat = "P2")]
         public double currentReliability = 0f;
 
-        [KSPField(guiName = "Reliability at Max Data", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiFormat = "P2")]
+        [KSPField(guiName = "#TestFlight_ReliabilityAtMaxData", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiFormat = "P2")]
         public double maxReliability = 0f;
 
         private bool hasThrustModifier;
@@ -242,12 +243,12 @@ namespace TestFlight
             // hide continuous burn time if it's the same as cumulative
             if (ratedBurnTime == ratedContinuousBurnTime)
             {
-                Fields[nameof(ratedBurnTime)].guiName = "Rated Burn Time";
+                Fields[nameof(ratedBurnTime)].guiName = "#TestFlight_RatedBurnTime";
                 Fields[nameof(ratedContinuousBurnTime)].guiActiveEditor = false;
             }
             else
             {
-                Fields[nameof(ratedBurnTime)].guiName = "Rated Cumulative Burn Time";
+                Fields[nameof(ratedBurnTime)].guiName = "#TestFlight_RatedCumulativeTime";
                 Fields[nameof(ratedContinuousBurnTime)].guiActiveEditor = true;
             }
 
@@ -298,7 +299,7 @@ namespace TestFlight
                         configNode.TryGetValue("ratedBurnTime", ref nodeBurnTime);
 
                         float burnThrough = nodeCycle.Evaluate(nodeCycle.maxTime);
-                        var infoString = String.Format("  Rated Burn Time: <color=#b1cc00ff>{0:F0} s</color>\n  <color=#ec423fff>{1:F0}%</color> failure at <color=#b1cc00ff>{2:F0} s</color>", nodeBurnTime, burnThrough, nodeCycle.maxTime);
+                        var infoString = Localizer.Format("#TestFlight_BurnTime_info", nodeBurnTime, burnThrough, nodeCycle.maxTime);
 
                         if (configNode.HasNode("thrustModifier"))
                         {

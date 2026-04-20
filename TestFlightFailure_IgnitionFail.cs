@@ -5,6 +5,8 @@ using UnityEngine;
 
 using TestFlightAPI;
 using UnityEngine.Profiling;
+using KSP.Localization;
+using System.Threading.Tasks;
 
 namespace TestFlight
 {
@@ -35,26 +37,27 @@ namespace TestFlight
         private static bool restartWindowPenaltyReminderShown;
         private bool preLaunchFailures;
         private bool dynPressurePenalties;
+
         private bool verboseDebugging;
 
         [KSPField(isPersistant=true)]
         private double previousTime;
 
-        [KSPField(guiName = "Ignition Chance", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "P2")]
+        [KSPField(guiName = "#TestFlight_GUI_IgnitionChance", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "P2")]
         private float ignitionChanceDisplay;
-        [KSPField(guiName = "Ignition Penalty for Q", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "P2")]
+        [KSPField(guiName = "#TestFlight_GUI_IgnitionPenaltyForQ", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "P2")]
         private float dynamicPressurePenalty;
-        [KSPField(guiName = "Restart Ignition Penalty", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "P2")]
+        [KSPField(guiName = "#TestFlight_GUI_RestartIgnitionPenalty", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "P2")]
         private float restartPenalty;
-        [KSPField(guiName = "Time Since Shutdown", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "N2", guiUnits = "s")]
+        [KSPField(guiName = "#TestFlight_GUI_TimeSinceShutdown", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActive = true, guiFormat = "N2", guiUnits = "s")]
         private float engineIdleTime;
-        [KSPField(guiName = "Last Restart", groupName = "TestFlightDebug", groupDisplayName = "TestFlightDebug", guiActive = true)]
+        [KSPField(guiName = "#TestFlight_GUI_LastRestart", groupName = "TestFlightDebug", groupDisplayName = "TestFlightDebug", guiActive = true)]
         private string restartRollString;
 
-        [KSPField(guiName = "Current Ignition Chance", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiFormat = "P2")]
+        [KSPField(guiName = "#TestFlight_GUI_CurrentIgnitionChance", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiFormat = "P2")]
         public float currentIgnitionChance = 0f;
 
-        [KSPField(guiName = "Max Ignition Chance", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiFormat = "P2")]
+        [KSPField(guiName = "#TestFlight_GUI_MaxIgnitionChance", groupName = "TestFlight", groupDisplayName = "TestFlight", guiActiveEditor = true, guiFormat = "P2")]
         public float maxIgnitionChance = 0f;
 
         private bool hasRestartWindow;
@@ -506,7 +509,7 @@ namespace TestFlight
 
                         float pMin = nodeIgnitionChance.Evaluate(nodeIgnitionChance.minTime);
                         float pMax = nodeIgnitionChance.Evaluate(nodeIgnitionChance.maxTime);
-                        infoString = $"  Ignition at 0 data: <color=#b1cc00ff>{pMin:P1}</color>\n  Ignition at max data: <color=#b1cc00ff>{pMax:P1}</color>";
+                        infoString = Localizer.Format("#TestFlight_Ignition_info", pMin,pMax);
                     }
                 }
             }
@@ -533,24 +536,24 @@ namespace TestFlight
             if (flightData < 0f)
                 flightData = 0f;
 
-            infoStrings.Add("<b>Ignition Reliability</b>");
-            infoStrings.Add(String.Format("<b>Current Ignition Chance</b>: {0:P}", baseIgnitionChance.Evaluate(flightData)));
-            infoStrings.Add(String.Format("<b>Maximum Ignition Chance</b>: {0:P}", baseIgnitionChance.Evaluate(baseIgnitionChance.maxTime)));
+            infoStrings.Add(Localizer.Format("#TestFlight_IgnitionReliability"));
+            infoStrings.Add(Localizer.Format("#TestFlight_IgnitionChance_Current", baseIgnitionChance.Evaluate(flightData)));
+            infoStrings.Add(Localizer.Format("#TestFlight_IgnitionChance_Max", baseIgnitionChance.Evaluate(baseIgnitionChance.maxTime)));
 
             if (additionalFailureChance > 0f)
-                infoStrings.Add(String.Format("<b>Cascade Failure Chance</b>: {0:P}", additionalFailureChance));
+                infoStrings.Add(Localizer.Format("#TestFlight_IgnitionChance_Cascade", additionalFailureChance));
 
             if (pressureCurve != null & pressureCurve.Curve.keys.Length > 1)
             {
                 float maxTime = pressureCurve.maxTime;
-                infoStrings.Add("<b>Dynamic pressure modifiers</b>");
-                infoStrings.Add($"<b>0 kPa Pressure Modifier:</b> {pressureCurve.Evaluate(0)}");
-                infoStrings.Add($"<b>{maxTime/1000} kPa Pressure Modifier</b>: {pressureCurve.Evaluate(maxTime):N}");
+                infoStrings.Add(Localizer.Format("#TestFlight_DynamicPressure_Title"));
+                infoStrings.Add(Localizer.Format("#TestFlight_DynamicPressure_0kPa",pressureCurve.Evaluate(0)));
+                infoStrings.Add(Localizer.Format("#TestFlight_DynamicPressure_1000kPa",maxTime / 1000,pressureCurve.Evaluate(maxTime)));
             }
 
             if (hasRestartWindow)
             {
-                infoStrings.Add("<B>Restart timing modifiers</b>");
+                infoStrings.Add(Localizer.Format("#TestFlight_RestartingTiming_Title"));
                 infoStrings.AddRange(RestartCurveDescription());
             }
 
@@ -622,7 +625,7 @@ namespace TestFlight
 
         private static void ShowDynPressurePenaltyInfo(string sPenaltyPercent)
         {
-            string msg = $"High dynamic pressure caused a {sPenaltyPercent} reduction in normal ignition reliability. Consider lighting the engine on the ground or higher up in the atmosphere.\nThese penalties are listed in both the flight log (F3) and in the Part Action Window.";
+            string msg = Localizer.Format("#TestFlight_HighDynamicPressure_Msg",sPenaltyPercent);
             PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f),
                  new Vector2(0.5f, 0.5f),
                  "IgnitionDynPressurePenaltyTip",
@@ -637,7 +640,7 @@ namespace TestFlight
 
         private void ShowRestartWindowPenaltyInfo(string sPenaltyPercent)
         {
-            string msg = $"{core.Title} has restart window modifiers which caused a {sPenaltyPercent} reduction in normal ignition reliability. Please refer to the Part Action Window to see the current penalty in-flight or middle click on the engine while in editor.";
+            string msg = Localizer.Format("#TestFlight_RestartWindowPressure_Msg",core.Title,sPenaltyPercent);
             PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f),
                  new Vector2(0.5f, 0.5f),
                  "RestartWindowPressurePenaltyTip",
