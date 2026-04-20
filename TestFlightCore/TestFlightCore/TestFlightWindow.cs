@@ -1,14 +1,16 @@
-﻿using System;
-using System.Linq;
+﻿using Expansions.Missions;
+using KSP.Localization;
+using KSP.UI.Screens;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-
-using UnityEngine;
-using KSP.UI.Screens;
-
-using TestFlightCore.KSPPluginFramework;
-
+using System.Linq;
+using System.Runtime.InteropServices;
 using TestFlightAPI;
+using TestFlightCore.KSPPluginFramework;
+using UnityEngine;
+using static CutsceneCamera.CameraKeyFrame;
+using static FinePrint.ContractDefs;
 
 namespace TestFlightCore
 {
@@ -20,7 +22,7 @@ namespace TestFlightCore
         private ApplicationLauncherButton appLauncherButton;
         private TestFlightHUD hud;
         private bool stickyWindow;
-        private readonly string[] guiSizes = { "Small", "Normal", "Large" };
+        private readonly string[] guiSizes = { Localizer.Format("#TestFlight_Size_Small"), Localizer.Format("#TestFlight_Size_Normal"), Localizer.Format("#TestFlight_Size_Large") };
 
         private DropDownList ddlSettingsPage = null;
 
@@ -234,11 +236,11 @@ namespace TestFlightCore
                 return;
             
             Dictionary<Guid, MasterStatusItem> masterStatus = tfManager.GetMasterStatus();
-            GUIContent settingsButton = new GUIContent(TestFlight.Resources.btnChevronDown, "Open Settings Panel");
+            GUIContent settingsButton = new GUIContent(TestFlight.Resources.btnChevronDown, Localizer.Format("#TestFlight_OpenSettings_Button"));
             if (tfScenario.userSettings.displaySettingsWindow)
             {
                 settingsButton.image = TestFlight.Resources.btnChevronUp;
-                settingsButton.tooltip = "Close Settings Panel";
+                settingsButton.tooltip = Localizer.Format("#TestFlight_CloseSettings_Button");
             }
 
             GUILayout.BeginVertical();
@@ -247,7 +249,7 @@ namespace TestFlightCore
             if (masterStatus == null)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("TestFlight is starting up...");
+                GUILayout.Label(Localizer.Format("#TestFlight_startingup"));
                 if (GUILayout.Button(settingsButton, GUILayout.Width(38)))
                 {
                     tfScenario.userSettings.displaySettingsWindow = !tfScenario.userSettings.displaySettingsWindow;
@@ -259,7 +261,7 @@ namespace TestFlightCore
             else if (masterStatus.Count() <= 0)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("TestFlight is not currently tracking any vessels");
+                GUILayout.Label(Localizer.Format("#TestFlight_isnotTrackingVessels"));
                 if (GUILayout.Button(settingsButton, GUILayout.Width(38)))
                 {
                     tfScenario.userSettings.displaySettingsWindow = !tfScenario.userSettings.displaySettingsWindow;
@@ -292,7 +294,7 @@ namespace TestFlightCore
                         // Part Name
                         string tooltip = "";
                         if (status.failures.Count <= 0)
-                            tooltip = "Status OK";
+                            tooltip = Localizer.Format("#TestFlight_Status_OK");
                         else
                         {
                             foreach (var fail in status.failures)
@@ -388,7 +390,7 @@ namespace TestFlightCore
                 {
                     case 0:
                         GUILayout.BeginHorizontal();
-                        if (DrawToggle(ref tfScenario.userSettings.showFailedPartsOnlyInMSD, "Show Failed Parts Only", Styles.styleToggle))
+                        if (DrawToggle(ref tfScenario.userSettings.showFailedPartsOnlyInMSD, Localizer.Format("#TestFlight_Show_FailedPartsOnly"), Styles.styleToggle))
                         {
                             tfScenario.userSettings.Save();
                             CalculateWindowBounds();
@@ -396,7 +398,7 @@ namespace TestFlightCore
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
-                        if (DrawToggle(ref tfScenario.userSettings.shortenPartNameInMSD, "Short Part Names", Styles.styleToggle))
+                        if (DrawToggle(ref tfScenario.userSettings.shortenPartNameInMSD, Localizer.Format("#TestFlight_Show_ShortPartNames"), Styles.styleToggle))
                         {
                             tfScenario.userSettings.Save();
                             CalculateWindowBounds();
@@ -404,7 +406,7 @@ namespace TestFlightCore
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
-                        if (DrawToggle(ref tfScenario.userSettings.showFlightDataInMSD, "Show Flight Data", Styles.styleToggle))
+                        if (DrawToggle(ref tfScenario.userSettings.showFlightDataInMSD, Localizer.Format("#TestFlight_Show_FlightData"), Styles.styleToggle))
                         {
                             tfScenario.userSettings.Save();
                             CalculateWindowBounds();
@@ -412,7 +414,15 @@ namespace TestFlightCore
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
-                        if (DrawToggle(ref tfScenario.userSettings.showMTBFStringInMSD, "Show MTBF", Styles.styleToggle))
+                        if (DrawToggle(ref tfScenario.userSettings.showMTBFStringInMSD, Localizer.Format("#TestFlight_Show_MTBF"), Styles.styleToggle))
+                        {
+                            tfScenario.userSettings.Save(); 
+                            CalculateWindowBounds();
+                        }
+                        GUILayout.EndHorizontal();
+
+                        GUILayout.BeginHorizontal();
+                        if (DrawToggle(ref tfScenario.userSettings.showFailureRateInMSD, Localizer.Format("#TestFlight_Show_FailureRate"), Styles.styleToggle))
                         {
                             tfScenario.userSettings.Save();
                             CalculateWindowBounds();
@@ -420,7 +430,7 @@ namespace TestFlightCore
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
-                        if (DrawToggle(ref tfScenario.userSettings.showFailureRateInMSD, "Show Failure Rate", Styles.styleToggle))
+                        if (DrawToggle(ref tfScenario.userSettings.showContinuousRunTimeInMSD, Localizer.Format("#TestFlight_Show_CurrentRunTime"), Styles.styleToggle))
                         {
                             tfScenario.userSettings.Save();
                             CalculateWindowBounds();
@@ -428,7 +438,7 @@ namespace TestFlightCore
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
-                        if (DrawToggle(ref tfScenario.userSettings.showContinuousRunTimeInMSD, "Show Current Run Time", Styles.styleToggle))
+                        if (DrawToggle(ref tfScenario.userSettings.showRunTimeInMSD, Localizer.Format("#TestFlight_Show_CumulativeRunTime"), Styles.styleToggle))
                         {
                             tfScenario.userSettings.Save();
                             CalculateWindowBounds();
@@ -436,7 +446,7 @@ namespace TestFlightCore
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
-                        if (DrawToggle(ref tfScenario.userSettings.showRunTimeInMSD, "Show Cumulative Run Time", Styles.styleToggle))
+                        if (DrawToggle(ref tfScenario.userSettings.showStatusTextInMSD, Localizer.Format("#TestFlight_Show_PartStatusText"), Styles.styleToggle))
                         {
                             tfScenario.userSettings.Save();
                             CalculateWindowBounds();
@@ -444,15 +454,7 @@ namespace TestFlightCore
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
-                        if (DrawToggle(ref tfScenario.userSettings.showStatusTextInMSD, "Show Part Status Text", Styles.styleToggle))
-                        {
-                            tfScenario.userSettings.Save();
-                            CalculateWindowBounds();
-                        }
-                        GUILayout.EndHorizontal();
-
-                        GUILayout.BeginHorizontal();
-                        if (DrawToggle(ref tfScenario.userSettings.mainWindowLocked, "Lock MSD Position", Styles.styleToggle))
+                        if (DrawToggle(ref tfScenario.userSettings.mainWindowLocked, Localizer.Format("#TestFlight_LockMSDPosition"), Styles.styleToggle))
                         {
                             if (tfScenario.userSettings.mainWindowLocked)
                             {
@@ -472,16 +474,22 @@ namespace TestFlightCore
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("MSD Size", GUILayout.Width(200));
+                        GUILayout.Label(Localizer.Format("#TestFlight_MSDSize"), GUILayout.Width(200));
                         tfScenario.userSettings.currentMSDSize = GUILayout.Toolbar(tfScenario.userSettings.currentMSDSize,guiSizes);
                         GUILayout.EndHorizontal();
 
                         break;
                     case 1:
+                        //Traslator's note:
+                        //#TestFlight_DataMultiplier_1 = Flight Data Multiplier 
+                        //#TestFlight_DataMultiplier_2 = Overall difficulty slider.\n 
+                        //#TestFlight_DataMultiplier_3 = "Increase to make all parts accumuate flight data faster.
+                        //Decrease to make them accumulate flight data slower.\n "
+                        //#TestFlight_ DataMultiplier_4 = A setting of 1 is normal rate 
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label(new GUIContent("Flight Data Multiplier", "Overall difficulty slider.\n" +
-                        "Increase to make all parts accumuate flight data faster.  Decrease to make them accumulate flight data slower.\n" +
-                        "A setting of 1 is normal rate"),
+                        GUILayout.Label(new GUIContent(Localizer.Format("#TestFlight_DataMultiplier_1"), Localizer.Format("#TestFlight_DataMultiplier_2") +
+                        Localizer.Format("#TestFlight_DataMultiplier_3") +
+                        Localizer.Format("#TestFlight_ DataMultiplier_4")),
                             GUILayout.Width(200)
                         );
                         if (DrawHorizontalSlider(ref tfScenario.userSettings.flightDataMultiplier, 0.5f, 2f, GUILayout.Width(150)))
@@ -492,9 +500,16 @@ namespace TestFlightCore
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label(new GUIContent("Flight Data Engineer Multiplier", "Overall difficulty slider\n" +
-                        "Increases or decreases the bonus applied to the accumulation of flight data from having Engineers in your crew.\n" +
-                        "A setting of 1 is normal difficulty."),
+                        //Translator's note:
+                        //#TestFlight_ DataEngineerMultiplier_1 = Flight Data Engineer Multiplier
+                        //#TestFlight_ DataEngineerMultiplier_2 = Overall difficulty slider\n
+                        //#TestFlight_ DataEngineerMultiplier_3 = "Increases or decreases the bonus applied to the 
+                        //accumulation of flight data from having Engineers in your crew.\n"
+                        //#TestFlight_ DataEngineerMultiplier_4 = A setting of 1 is normal difficulty.
+
+                        GUILayout.Label(new GUIContent(Localizer.Format("#TestFlight_ DataEngineerMultiplier_1"), Localizer.Format("#TestFlight_ DataEngineerMultiplier_2") +
+                        Localizer.Format("#TestFlight_ DataEngineerMultiplier_3") +
+                        Localizer.Format("#TestFlight_ DataEngineerMultiplier_4")),
                             GUILayout.Width(200)
                         );
                         if (DrawHorizontalSlider(ref tfScenario.userSettings.flightDataEngineerMultiplier, 0.5f, 2f, GUILayout.Width(150)))
@@ -505,7 +520,7 @@ namespace TestFlightCore
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
-                        if (DrawToggle(ref tfScenario.userSettings.singleScope, "Use a single scope for all data", Styles.styleToggle))
+                        if (DrawToggle(ref tfScenario.userSettings.singleScope, Localizer.Format("#TestFlight_UseSingleScope"), Styles.styleToggle))
                         {
                             tfScenario.userSettings.Save();
                         }
@@ -513,7 +528,7 @@ namespace TestFlightCore
                         break;
                     case 2:
                         GUILayout.BeginHorizontal();
-                        if (DrawToggle(ref tfScenario.userSettings.debugLog, "Enable Debugging", Styles.styleToggle))
+                        if (DrawToggle(ref tfScenario.userSettings.debugLog, Localizer.Format("#TestFlight_EnabledDebugging"), Styles.styleToggle))
                         {
                             tfScenario.userSettings.Save();
                         }
@@ -522,14 +537,14 @@ namespace TestFlightCore
                     case 3:
                         GUILayout.BeginHorizontal();
                         bool saveEnabled = tfScenario.SettingsEnabled;
-                        if (DrawToggle(ref saveEnabled, "TestFlight Enabled", Styles.styleToggle))
+                        if (DrawToggle(ref saveEnabled, Localizer.Format("#TestFlight_ModEnabled"), Styles.styleToggle))
                         {
                             tfScenario.SettingsEnabled = saveEnabled;
                         }
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
                         bool saveMaxData = tfScenario.SettingsAlwaysMaxData;
-                        if (DrawToggle(ref saveMaxData, "Parts always have Maximum Data", Styles.styleToggle))
+                        if (DrawToggle(ref saveMaxData, Localizer.Format("#TestFlight_PartsHaveMaxData"), Styles.styleToggle))
                         {
                             tfScenario.SettingsAlwaysMaxData = saveMaxData;
                         }

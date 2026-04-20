@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using KSP.UI.Screens;
+using KSP.Localization;
 
 using TestFlightCore.KSPPluginFramework;
 
@@ -198,32 +199,32 @@ namespace TestFlightCore
             switch (tfScenario.userSettings.kscWindowPage)
             {
                 case 0:
-                    GUILayout.Label("Research & Development");
+                    GUILayout.Label(Localizer.Format("#TestFlight_R&D"));
                     List<string> partsInResearch = tfRnDScenario.GetPartsInResearch();
                     if (!tfScenario.SettingsEnabled)
-                        GUILayout.Label("R&D is not available because TestFlight is disabled in this save.\nYou can enable it from the settings tab.");
+                        GUILayout.Label(Localizer.Format("#TestFlight_R&DIsNotAvailable"));
                     else if (partsInResearch == null || partsInResearch.Count == 0)
-                        GUILayout.Label("Here you can manage engineering teams working on your hardware.\nYou can start new research programs from the VAB.");
+                        GUILayout.Label(Localizer.Format("#TestFlight_R&DMessage"));
                     else
                     {
                         GUILayout.BeginVertical();
                         foreach (string partInResearch in partsInResearch)
                         {
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Stop", GUILayout.Width(50)))
+                            if (GUILayout.Button(Localizer.Format("#TestFlight_Stop"), GUILayout.Width(50)))
                             {
                                 tfRnDScenario.RemoveResearch(partInResearch);
                             }
                             if (tfRnDScenario.GetPartResearchState(partInResearch))
                             {
-                                if (GUILayout.Button("Pause", GUILayout.Width(75)))
+                                if (GUILayout.Button(Localizer.Format("#TestFlight_Pause"), GUILayout.Width(75)))
                                 {
                                     tfRnDScenario.SetPartResearchState(partInResearch, false);
                                 }
                             }
                             else
                             {
-                                if (GUILayout.Button("Resume", GUILayout.Width(75)))
+                                if (GUILayout.Button(Localizer.Format("#TestFlight_Resume"), GUILayout.Width(75)))
                                 {
                                     tfRnDScenario.SetPartResearchState(partInResearch, true);
                                 }
@@ -248,14 +249,14 @@ namespace TestFlightCore
                     {
                         case 0:
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label("Visual settings for the Master Status Display can be set in the settings page in the Flight scene");
+                            GUILayout.Label(Localizer.Format("#TestFlight_VisualSettingText"));
                             GUILayout.EndHorizontal();
                             break;
                         case 1:
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label(new GUIContent("Flight Data Multiplier", "Overall difficulty slider.\n" +
-                                "Increase to make all parts accumuate flight data faster.  Decrease to make them accumulate flight data slower.\n" +
-                                "A setting of 1 is normal rate"),
+                            GUILayout.Label(new GUIContent(Localizer.Format("#TestFlight_FlightDataMultiplier"), Localizer.Format("#TestFlight_DifficultySlider") +
+                                Localizer.Format("#TestFlight_DifficultyMessage") +
+                                Localizer.Format("#TestFlight_NormalRateOfSetting")),
                                 GUILayout.Width(200)
                             );
                             if (DrawHorizontalSlider(ref tfScenario.userSettings.flightDataMultiplier, 0.5f, 2f, GUILayout.Width(150)))
@@ -266,9 +267,9 @@ namespace TestFlightCore
                             GUILayout.EndHorizontal();
 
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label(new GUIContent("Flight Data Engineer Multiplier", "Overall difficulty slider\n" +
-                                "Increases or decreases the bonus applied to the accumulation of flight data from having Engineers in your crew.\n" +
-                                "A setting of 1 is normal difficulty."),
+                            GUILayout.Label(new GUIContent(Localizer.Format("#TestFlight_FlightDataEngineerMultiplier"), Localizer.Format("#TestFlight_DifficultySlider") +
+                                Localizer.Format("#TestFlight_DifficultyMessage") +
+                                Localizer.Format("#TestFlight_NormalRateOfSetting")),
                                 GUILayout.Width(200)
                             );
                             if (DrawHorizontalSlider(ref tfScenario.userSettings.flightDataEngineerMultiplier, 0.5f, 2f, GUILayout.Width(150)))
@@ -279,7 +280,7 @@ namespace TestFlightCore
                             GUILayout.EndHorizontal();
 
                             GUILayout.BeginHorizontal();
-                            if (DrawToggle(ref tfScenario.userSettings.singleScope, "Use a single scope for all data", Styles.styleToggle))
+                            if (DrawToggle(ref tfScenario.userSettings.singleScope, Localizer.Format("#TestFlight_UseSingleScope"), Styles.styleToggle))
                             {
                                 tfScenario.userSettings.Save();
                             }
@@ -287,7 +288,7 @@ namespace TestFlightCore
                             break;
                         case 2:
                             GUILayout.BeginHorizontal();
-                            if (DrawToggle(ref tfScenario.userSettings.debugLog, "Enable Debugging", Styles.styleToggle))
+                            if (DrawToggle(ref tfScenario.userSettings.debugLog, Localizer.Format("#TestFlight_EnabledDebugging"), Styles.styleToggle))
                             {
                                 tfScenario.userSettings.Save();
                             }
@@ -296,21 +297,21 @@ namespace TestFlightCore
                         case 3:
                             GUILayout.BeginHorizontal();
                             bool saveEnabled = tfScenario.SettingsEnabled;
-                            if (DrawToggle(ref saveEnabled, "TestFlight Enabled", Styles.styleToggle))
+                            if (DrawToggle(ref saveEnabled, Localizer.Format("#TestFlight_ModEnabled"), Styles.styleToggle))
                             {
                                 tfScenario.SettingsEnabled = saveEnabled;
                             }
                             GUILayout.EndHorizontal();
                             GUILayout.BeginHorizontal();
                             bool saveMaxData = tfScenario.SettingsAlwaysMaxData;
-                            if (DrawToggle(ref saveMaxData, "Parts always have Maximum Data", Styles.styleToggle))
+                            if (DrawToggle(ref saveMaxData, Localizer.Format("#TestFlight_PartsHaveMaxData"), Styles.styleToggle))
                             {
                                 tfScenario.SettingsAlwaysMaxData = saveMaxData;
                             }
                             GUILayout.EndHorizontal();
                             GUILayout.BeginHorizontal();
                             bool techDiscountEnabled = tfScenario.SettingsTechDiscountEnabled;
-                            if (DrawToggle(ref techDiscountEnabled, "Apply discount to tech node cost for flown parts", Styles.styleToggle))
+                            if (DrawToggle(ref techDiscountEnabled, Localizer.Format("#TestFlight_ApplyDiscount"), Styles.styleToggle))
                             {
                                 tfScenario.SettingsTechDiscountEnabled = techDiscountEnabled;
                             }

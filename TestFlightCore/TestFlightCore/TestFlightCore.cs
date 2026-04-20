@@ -6,6 +6,7 @@ using UnityEngine.Profiling;
 using TestFlightCore.KSPPluginFramework;
 using TestFlightAPI;
 using System.Linq;
+using KSP.Localization;
 
 namespace TestFlightCore
 {
@@ -194,7 +195,7 @@ namespace TestFlightCore
             return prevConfig == currentConfig;
         }
 
-        [KSPEvent(guiActiveEditor=false, guiName = "R&D Window")]            
+        [KSPEvent(guiActiveEditor=false, guiName = "#TestFlight_R&Dwindow")]            
         public void ToggleRNDGUI()
         {
             TestFlightEditorWindow.Instance.LockPart(this.part, Alias);
@@ -1098,7 +1099,7 @@ namespace TestFlightCore
             return failures.Count == 0 ? 0 : 1;
         }
 
-        public override string GetModuleDisplayName() => $"Test Flight reliability for {Title}";
+        public override string GetModuleDisplayName() => Localizer.Format("#TestFlight_TF_ReliabilityTitle",Title);
 
         public override string GetInfo()
         {

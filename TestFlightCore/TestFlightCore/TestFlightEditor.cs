@@ -7,8 +7,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using KSP.UI.Screens;
 using TestFlightCore.KSPPluginFramework;
+using KSP.Localization;
 
 using TestFlightAPI;
+using System.Net.NetworkInformation;
 
 namespace TestFlightCore
 {
@@ -329,7 +331,7 @@ namespace TestFlightCore
 
             ITestFlightCore core = null;
             GUILayout.BeginVertical();
-            GUILayout.Label(String.Format("Selected Part: {0}", selectedAlias), Styles.styleEditorTitle);
+            GUILayout.Label(Localizer.Format("#TestFlight_Show_SelectedPart", selectedAlias), Styles.styleEditorTitle);
 
             core = TestFlightUtil.GetCore(SelectedPart, selectedAlias);
             if (core != null)
@@ -373,7 +375,7 @@ namespace TestFlightCore
                         }
                         GUILayout.Label("Hire Research Team", Styles.styleEditorTitle);
                         GUILayout.Label("Research teams deduct funds and add flight data to your part", Styles.styleEditorText);
-                        GUILayout.Label("A research cycle lasts <b>" + cycleString + "</b>", Styles.styleEditorText);
+                        GUILayout.Label(Localizer.Format("#TestFlight_ResearchCycleLast") + "<b>" + cycleString + "</b>", Styles.styleEditorText);
                         GUILayout.Label("At the end of each cycle, funds will be deducted and data added", Styles.styleEditorText);
                         GUILayout.Label("The costs and research rate varies by team", Styles.styleEditorText);
 
@@ -384,7 +386,7 @@ namespace TestFlightCore
                             for (int i = 0; i < numTeams; i++)
                             {
                                 GUILayout.BeginHorizontal();
-                                if (GUILayout.Button(String.Format("Hire Team"), GUILayout.Width(100)))
+                                if (GUILayout.Button(Localizer.Format("#TestFlighyt_HireTeam"), GUILayout.Width(100)))
                                 {
                                     tfRnDScenario.AddResearchTeam(SelectedPart, selectedAlias, i);
                                 }
@@ -393,7 +395,7 @@ namespace TestFlightCore
                                 float cost = teams[i].costFactor * points;
                                 points = points * core.GetRnDRate();
                                 cost = cost * core.GetRnDCost();
-                                GUILayout.Label(String.Format("<b>{0,7:F2}</b> data, <b>{1,7:F2}</b> funds", points, cost), Styles.styleEditorTextAligned);
+                                GUILayout.Label(Localizer.Format("#TestFlight_ShowDataAndFunds", points, cost), Styles.styleEditorTextAligned);
                                 GUILayout.EndHorizontal();
                             }
                         }
